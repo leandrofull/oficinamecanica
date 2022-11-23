@@ -7,7 +7,7 @@ O objetivo deste projeto é dar os primeiros passos rumo a um sistema de gestão
 
 Aqui temos: módulo de clientes, módulo de veículo, módulo de funcionários e módulo de Ordens de Serviço.
 
-Em todos os módulos, é possível criar/editar/arquivar/desarquivar os cadastros, além de algumas recursos extras dentro do módulo de Ordens de Serviço.
+Em todos os módulos, é possível criar/editar/arquivar/desarquivar os cadastros, além de alguns recursos extras dentro do módulo de Ordens de Serviço.
 
 Para instalar esse aplicativo em sua máquina, é necessário que você renomeie os arquivos file.env, file.htaccess e public/file.htaccess para .env, .htaccess e public/.htaccess respectivamente.
 
