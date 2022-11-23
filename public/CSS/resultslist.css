@@ -1,0 +1,80 @@
+.material-symbols-outlined {
+	cursor:pointer;
+	font-size:1.2rem;
+	font-variation-settings:
+	'FILL' 0,
+	'wght' 400,
+	'GRAD' 0,
+	'opsz' 20;
+}
+
+/* Search */
+.search {
+	padding-bottom:50px;
+	width:500px;
+	margin:0 auto;
+	display:flex;
+}
+
+.search input {
+
+}
+/* Search */
+
+/* List */
+	/* Table */
+	.page-title {
+		margin:0;
+		margin-top:50px;
+		margin-bottom:30px;
+		text-align:center;
+		font-weight:bold;
+		font-size:1.4rem;
+	}
+	.list {
+		margin:0 auto;
+		max-width:1000px;
+	}
+	.list-cols {
+		background-color:#212529;
+		color:#f9f9f9;
+	}
+	.list .table a {
+		color:black;
+	}
+	/* Table */
+
+	/* Pagination */
+	nav .pagination .page-item .page-link {
+		color:black;
+		border:1px solid #b9aaaa;
+	}
+	nav .pagination .page-item .page-link:hover {
+		background-color:rgba(38, 38, 38, 0.5);
+	}
+	nav .pagination .active .page-link {
+		color:white;
+		background-color:#262626;
+	}
+	/* Pagination */
+
+	/* Actions */
+	.list-actions {
+		margin-top:30px;
+		padding:30px 10px;
+		border-top:1px solid #cfb7b7;
+		border-bottom:1px solid #cfb7b7;
+	}
+	.list-actions-title {
+		margin:0;
+		padding:0;
+		font-weight:bold;
+	}
+	.list-actions-selections {
+		font-style:italic;
+		margin:0;
+		margin-bottom:10px;
+		padding:0;
+	}
+	/* Actions */
+/* List */

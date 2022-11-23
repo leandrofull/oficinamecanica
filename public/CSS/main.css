@@ -1,0 +1,41 @@
+/* Main */
+* {
+	font-family:'Lato', sans-serif;
+}
+
+#main {
+	max-width:1920px;
+	margin:0 auto;
+}
+/* Main */
+
+/* Navbar */
+.navbar {
+	min-height:80px;
+}
+.navbar .navbar-brand img {
+	margin-top:-5px;
+}
+.navbar .navbar-brand p {
+	margin:5px 0 0 5px;
+	padding:0;
+	display:inline-block;
+}
+/* Navbar */
+
+/* Footer */
+.footer {
+	max-width:1920px;
+	margin:0 auto;
+	margin-top:200px;
+	background-color:black;
+	color:#8f8b8b;
+	align-items:center;
+	padding:20px;
+}
+
+.footer p {
+	margin:0;
+	padding:0;
+}
+/* Footer */

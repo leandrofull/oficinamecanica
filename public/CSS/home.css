@@ -1,0 +1,61 @@
+/* Welcome */
+.welcome {
+	margin:0;
+	align-items:center;
+	justify-content:center;
+	background-color:#63c295;
+	color:#fffbfb;
+	display:flex;
+	min-height:100px;
+	font-size:1.6rem;
+	font-weight:bold;
+	font-variation-settings:
+	'FILL' 0,
+	'wght' 400,
+	'GRAD' 0,
+	'opsz' 48;
+}
+/* Welcome */
+
+/* Summary */
+.summary {
+	margin:0;
+}
+.summary2 {
+	margin-top:50px;
+}
+.summary .row {
+	max-width:850px;
+	margin:0 auto;
+}
+.summary-title {
+	margin:0;
+	margin-top:30px;
+	margin-bottom:30px;
+	text-align:center;
+	font-weight:bold;
+	font-size:1.4rem;
+}
+.summary-item {
+	border:0.1px solid #c9c9c9;
+	border-radius:5px;
+	margin-top:10px;
+	box-shadow:1px 1px 1px 1px rgba(0, 0, 0, 0.14);
+}
+.summary-item-title {
+	text-align:center;
+	background-color:#212529;
+	color:#f9f9f9;
+	font-weight:bold;
+	font-size:1.2rem;
+	padding:3px 5px;
+}
+.summary-item-value {
+	min-height:50px;
+	text-align:center;
+	justify-content:center;
+	align-items:center;
+	display:flex;
+	font-size:1.2rem;
+}
+/* Summary */
