@@ -15,6 +15,6 @@ No arquivo .env, coloque os dados do seu banco de dados.
 
 Configure o arquivo config.php. Neste passo, é importante que a constante DOMAIN aponte para a pasta public.
 
-Depois disso, basta você acessar o sistema utilizando as estas credenciais de acesso:<br/>
+Depois disso, basta você acessar o sistema utilizando as credenciais de acesso:<br/>
 Login: teste_convidado<br/>
 Senha: teste123
