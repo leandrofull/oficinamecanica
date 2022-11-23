@@ -1,0 +1,19 @@
+<IfModule mod_rewrite.c>
+Options +FollowSymLinks
+
+order deny,allow
+allow from all
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_URI} !-f
+RewriteCond %{REQUEST_URI} !-d
+RewriteCond %{REQUEST_URI} !-l
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+<FilesMatch "\.(css|js|png|jpg)$">
+RewriteCond %{REQUEST_URI} -f
+RewriteCond %{REQUEST_URI} -d
+RewriteCond %{REQUEST_URI} -l
+</FilesMatch>
+</IfModule>
