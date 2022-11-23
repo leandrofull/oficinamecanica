@@ -11,6 +11,8 @@ Em todos os módulos, é possível criar/editar/arquivar/desarquivar os cadastro
 
 Para instalar este aplicativo em sua máquina, é necessário que você renomeie os arquivos file.env, file.htaccess e public/file.htaccess para .env, .htaccess e public/.htaccess respectivamente.
 
+Envie para o seu banco de dados (do tipo MySQL) o arquivo oficinamecanica.sql.
+
 No arquivo .env, coloque os dados do seu banco de dados.
 
 Configure o arquivo config.php. Neste passo, é importante que a constante DOMAIN aponte para a pasta public.
