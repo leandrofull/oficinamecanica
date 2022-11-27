@@ -3,50 +3,23 @@
 <div id="main">
 	<?php require_once(PROJECT_DIRECTORY.'/public/View/Navbar.php'); ?>
 
-	<!-- Archive Return -->
+	<!-- Return -->
 	<?php 
-		if(isset($archiveReturn) && $archiveReturn['error'] == true) {
+		if(isset($_SESSION['error']) && $_SESSION['error'] == true) {
 			echo '<div class="container-fluid welcome" style="background-color:#fc5b5b;font-weight:normal;">';	
-			echo $archiveReturn['errorMsg'].'  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">sentiment_dissatisfied</span>';
+			echo $_SESSION['errorMsg'].'  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">sentiment_dissatisfied</span>';
 			echo '</div>';
-		} else if(isset($archiveReturn) && $archiveReturn['error'] == false) {
+			unset($_SESSION['error']);
+			unset($_SESSION['errorMsg']);
+		} else if(isset($_SESSION['error']) && $_SESSION['error'] == false) {
 			echo '<div class="container-fluid welcome" style="font-weight:normal;">';
-			if($veiculo->archiveMode)
-				echo $archiveReturn['affectedRecords'].' veículos desarquivados com sucesso!  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">mood</span>';
-			else
-				echo $archiveReturn['affectedRecords'].' veículos arquivados com sucesso!  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">mood</span>';
+			echo $_SESSION['errorMsg'].' <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">mood</span>';
 			echo '</div>';
+			unset($_SESSION['error']);
+			unset($_SESSION['errorMsg']);
 		}
 	?>
-	<!-- Archive Return -->
-
-	<!-- Register Return -->
-	<?php 
-		if(isset($registerReturn) && $registerReturn['error'] == true) {
-			echo '<div class="container-fluid welcome" style="background-color:#fc5b5b;font-weight:normal;">';	
-			echo $registerReturn['errorMsg'].'  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">sentiment_dissatisfied</span>';
-			echo '</div>';
-		} else if(isset($registerReturn) && $registerReturn['error'] == false) {
-			echo '<div class="container-fluid welcome" style="font-weight:normal;">';
-			echo 'Cadastro realizado com sucesso!  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">mood</span>';
-			echo '</div>';
-		}
-	?>
-	<!-- Register Return -->
-
-	<!-- Edit Return -->
-	<?php 
-		if(isset($editReturn) && $editReturn['error'] == true) {
-			echo '<div class="container-fluid welcome" style="background-color:#fc5b5b;font-weight:normal;">';	
-			echo $editReturn['errorMsg'].'  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">sentiment_dissatisfied</span>';
-			echo '</div>';
-		} else if(isset($editReturn) && $editReturn['error'] == false) {
-			echo '<div class="container-fluid welcome" style="font-weight:normal;">';
-			echo 'Cadastro atualizado com sucesso!  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">mood</span>';
-			echo '</div>';
-		}
-	?>
-	<!-- Edit Return -->
+	<!-- Return -->
 
 	<!-- Page Title -->
 	<p class="page-title">Veículos Cadastrados</p>
@@ -66,6 +39,7 @@
 	<!-- List -->
 	<div class="list">
 		<!-- Table -->
+		<div class="divTable">
 		<table class="table">
 		  <thead>
 		    <tr class="list-cols">
@@ -104,6 +78,7 @@
 			<?php } ?>
 		  </tbody>
 		</table>
+		</div>
 		<!-- Table -->
 
 		<!-- Pagination -->

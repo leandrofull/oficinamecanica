@@ -27,10 +27,11 @@
 			$ordem = new OrdemModel();
 			$ordem->archiveMode = true;
 			$return = $ordem->archiveByIds();
+			$_SESSION['error'] = $return['error'];
+			$_SESSION['errorMsg'] = $return['errorMsg'];
 
 			// View
-			header( "Location: ".DOMAIN."/ordens/arquivados/1?registerError=".
-					$return["error"]."&registerErrorMsg=".$return["errorMsg"] );
+			header("Location: ".DOMAIN."/ordens/arquivados/1");
 		}
 	}
 ?>

@@ -290,7 +290,7 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 			  <div class="modal-header">
-			    <h5 class="modal-title">Enviar O.S. para o cliente validação</h5>
+			    <h5 class="modal-title">Enviar O.S. para o cliente validar</h5>
 			    <button type="button" id="modalSendToClienteClose" class="btn-close"></button>
 			  </div>
 			  <div class="modal-body">

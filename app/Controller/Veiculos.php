@@ -14,6 +14,7 @@
 			$view = new View();
 			$view->setPageTitle(APP_NAME." - Veículos");
 			$view->addCSSFile('main.css');
+			$view->addCSSFile('home.css');
 			$view->addCSSFile('resultslist.css');
 			$view->addJSFile('arquivar.js');
 			$view->setNavLinkActive('veiculos');
@@ -27,16 +28,11 @@
 			$veiculo = new VeiculoModel();
 			$archiveReturn = $veiculo->archiveByIds();
 			$veiculo->getAllByPage($pageNum);
+			$_SESSION['error'] = $archiveReturn['error'];
+			$_SESSION['errorMsg'] = $archiveReturn['errorMsg'];
 
 			// View
-			$view = new View();
-			$view->setPageTitle(APP_NAME." - Veículos");
-			$view->addCSSFile('main.css');
-			$view->addCSSFile('home.css');
-			$view->addCSSFile('resultslist.css');
-			$view->addJSFile('arquivar.js');
-			$view->setNavLinkActive('veiculos');
-			require_once PROJECT_DIRECTORY.'/public/View/Veiculos.php';
+			header("Location: ".DOMAIN."/veiculos");
 		}
 
 		public function new(): void {
@@ -90,16 +86,11 @@
 			$veiculo = new VeiculoModel();
 			$registerReturn = $veiculo->register();
 			$veiculo->getAllByPage($pageNum);
+			$_SESSION['error'] = $registerReturn['error'];
+			$_SESSION['errorMsg'] = $registerReturn['errorMsg'];
 
 			// View
-			$view = new View();
-			$view->setPageTitle(APP_NAME." - Veículos");
-			$view->addCSSFile('main.css');
-			$view->addCSSFile('home.css');
-			$view->addCSSFile('resultslist.css');
-			$view->addJSFile('arquivar.js');
-			$view->setNavLinkActive('veiculos');
-			require_once PROJECT_DIRECTORY.'/public/View/Veiculos.php';
+			header("Location: ".DOMAIN."/veiculos");
 		}
 
 		public function save(): void {
@@ -109,16 +100,11 @@
 			$veiculo = new VeiculoModel();
 			$editReturn = $veiculo->edit();
 			$veiculo->getAllByPage($pageNum);
+			$_SESSION['error'] = $editReturn['error'];
+			$_SESSION['errorMsg'] = $editReturn['errorMsg'];
 
 			// View
-			$view = new View();
-			$view->setPageTitle(APP_NAME." - Veículos");
-			$view->addCSSFile('main.css');
-			$view->addCSSFile('home.css');
-			$view->addCSSFile('resultslist.css');
-			$view->addJSFile('arquivar.js');
-			$view->setNavLinkActive('veiculos');
-			require_once PROJECT_DIRECTORY.'/public/View/Veiculos.php';
+			header("Location: ".DOMAIN."/veiculos");
 		}
 	}
 ?>

@@ -25,10 +25,11 @@
 			// Model
 			$ordem = new OrdemModel();
 			$return = $ordem->archiveByIds();
+			$_SESSION['error'] = $return['error'];
+			$_SESSION['errorMsg'] = $return['errorMsg'];
 
 			// View
-			header( "Location: ".DOMAIN."/ordens?registerError=".
-					$return["error"]."&registerErrorMsg=".$return["errorMsg"] );
+			header("Location: ".DOMAIN."/ordens");
 		}
 
 		public function new(): void {
@@ -93,10 +94,11 @@
 			// Model
 			$ordem = new OrdemModel();
 			$return = $ordem->register();
+			$_SESSION['error'] = $return['error'];
+			$_SESSION['errorMsg'] = $return['errorMsg'];
 
 			// View
-			header( "Location: ".DOMAIN."/ordens?registerError=".
-					$return["error"]."&registerErrorMsg=".$return["errorMsg"] );
+			header("Location: ".DOMAIN."/ordens");
 		}
 
 		public function deleteVeiculoFotos(): void {
@@ -111,10 +113,11 @@
 			// Model
 			$ordem = new OrdemModel();
 			$return = $ordem->edit();
+			$_SESSION['error'] = $return['error'];
+			$_SESSION['errorMsg'] = $return['errorMsg'];
 
 			// View
-			header( "Location: ".DOMAIN."/ordens?registerError=".
-					$return["error"]."&registerErrorMsg=".$return["errorMsg"] );
+			header("Location: ".DOMAIN."/ordens");
 		}
 
 		public function sendOS(): void {

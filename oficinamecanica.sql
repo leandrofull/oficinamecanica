@@ -89,6 +89,7 @@ CREATE TABLE `ordens` (
   `validacao_ip` varchar(100) NOT NULL,
   `validacao_link` varchar(1000) DEFAULT NULL,
   `validacao_data` datetime DEFAULT NULL,
+  `validacao_whatsapp` varchar(100) NOT NULL,
   `arquivado` tinyint(1) NOT NULL DEFAULT 0,
   `data_cadastro` datetime NOT NULL DEFAULT current_timestamp(),
   `ultima_modificacao` datetime NOT NULL DEFAULT current_timestamp()

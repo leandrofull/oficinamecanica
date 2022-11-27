@@ -26,29 +26,29 @@
 
 			//PESQUISA
 			$pesquisa = "";
-			if(isset($_GET['search']) && !empty($_GET['search'])) {
-				$name = preg_replace("/[^a-zA-Zà-úÀ-Ú\ ]/", "",$_GET['search']);
-				$name = preg_replace("/\s{2,}/", " ", trim($name));
-				if(mb_strlen($name) < 3) $name = "156115635";
+			if( isset($_GET['search']) &&
+				(!empty($_GET['search']) || $_GET['search'] == "0") )
+			{
+				$_GET['search'] = preg_replace('/[^A-Za-zÀ-Úà-ú0-9\#\(\)\-\.\_\ ]/', "", $_GET['search']);
+				
+				$name = preg_replace("/\s{2,}/", " ", trim($_GET['search']));
+				if(mb_strlen($name) < 1) $name = "156115635";
 
 				$pesquisa = " AND (nome LIKE '%$name%'";
 
-				$cargo = preg_replace("/[^a-zA-Zà-úÀ-Ú\ ]/", "",$_GET['search']);
-				$cargo = preg_replace("/\s{2,}/", " ", trim($cargo));
-				if(mb_strlen($cargo) < 5) $cargo = "156115635";
+				$cargo = preg_replace("/\s{2,}/", " ", trim($_GET['search']));
+				if(mb_strlen($cargo) < 1) $cargo = "156115635";
 
 				$pesquisa .= " OR cargo LIKE '%$cargo%'";
 
-				$cpf = preg_replace("/\D/", "", $_GET['search']);
-				$cpf = preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "$1.$2.$3-$4", $cpf);
-				$teste = preg_match("/^\d{3}\.\d{3}\.\d{3}\-\d{2}$/", $cpf);
-				if(!$teste) $cpf = "FAILED";
+				$cpf = str_replace(".", "", trim($_GET['search']));
+				$cpf = str_replace("-", "", $cpf);
+				if(!ctype_digit($cpf)) $cpf = "FAILED";
+				
+				$pesquisa .= " OR REPLACE(REPLACE(cpf, '-', ''), '.', '') LIKE '%$cpf%'";
 
-				$pesquisa .= " OR cpf LIKE '%$cpf%'";
-
-				$matricula = preg_replace("/\D/", "", $_GET['search']);
-				if(empty($matricula) || $matricula < 1) $matricula = "FAILED";
-				else $matricula = str_pad($matricula, 11, '0', STR_PAD_LEFT);
+				$matricula = trim($_GET['search']);
+				if(!ctype_digit($matricula)) $matricula = "FAILED";
 
 				$pesquisa .= " OR matricula LIKE '%$matricula%')";
 			}
@@ -154,12 +154,13 @@
 						$this->update('funcionarios', ['arquivado', 'ultima_modificacao'], ['true', "'".date('Y-m-d H:i:s')."'"], "WHERE id=".$value);
 					}
 				}
+				if($this->archiveMode) $errorMsg = count($_POST['selectedItems'])." funcionários foram desarquivados com sucesso!";
+				else $errorMsg = count($_POST['selectedItems'])." funcionários foram arquivados com sucesso!";
 			}
 
 			return [
 			"error" => $error,
-			"errorMsg" => $errorMsg,
-			"affectedRecords" => count($_POST['selectedItems'])];
+			"errorMsg" => $errorMsg];
 		}
 
 		public function register(): array {
@@ -197,6 +198,8 @@
 					$values .= "'$inputAdmissao', '$inputDemissao'";
 
 					$this->insert($table, $columns, $values);
+
+					$errorMsg = "Funcionário cadastrado com sucesso!";
 				}
 			}
 
@@ -245,6 +248,8 @@
 						$filter = "WHERE id = ".$_POST['inputID'];
 						
 						$this->update($table, $columns, $values, $filter);
+
+						$errorMsg = "Informações do funcionário atualizadas com sucesso!";
 					}
 				}
 			}
@@ -260,8 +265,8 @@
 			$tmp--;
 			$tmp = str_pad($tmp, 2, '0', STR_PAD_LEFT);
 			$mesAnterior = date("Y-".$tmp."-d H:i:s");
-			$filter = "WHERE data_cadastro BETWEEN '{$mesAnterior}'";
-			$filter .= " AND '{$dataAtual}'";
+			$filter = "WHERE (data_cadastro BETWEEN '{$mesAnterior}'";
+			$filter .= " AND '{$dataAtual}') AND (arquivado = 0)";
 
 			$tmp = $this->select("COUNT(*) as total", "funcionarios", $filter);
 			

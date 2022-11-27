@@ -14,6 +14,7 @@
 			$view = new View();
 			$view->setPageTitle(APP_NAME." - Clientes");
 			$view->addCSSFile('main.css');
+			$view->addCSSFile('home.css');
 			$view->addCSSFile('resultslist.css');
 			$view->addJSFile('arquivar.js');
 			$view->setNavLinkActive('clientes');
@@ -27,16 +28,11 @@
 			$cliente = new ClienteModel();
 			$archiveReturn = $cliente->archiveByIds();
 			$cliente->getAllByPage($pageNum);
+			$_SESSION['error'] = $archiveReturn['error'];
+			$_SESSION['errorMsg'] = $archiveReturn['errorMsg'];
 
 			// View
-			$view = new View();
-			$view->setPageTitle(APP_NAME." - Clientes");
-			$view->addCSSFile('main.css');
-			$view->addCSSFile('home.css');
-			$view->addCSSFile('resultslist.css');
-			$view->addJSFile('arquivar.js');
-			$view->setNavLinkActive('clientes');
-			require_once PROJECT_DIRECTORY.'/public/View/Clientes.php';
+			header("Location: ".DOMAIN."/clientes");
 		}
 
 		public function new(): void {
@@ -77,16 +73,11 @@
 			$cliente = new ClienteModel();
 			$registerReturn = $cliente->register();
 			$cliente->getAllByPage($pageNum);
+			$_SESSION['error'] = $registerReturn['error'];
+			$_SESSION['errorMsg'] = $registerReturn['errorMsg'];
 
 			// View
-			$view = new View();
-			$view->setPageTitle(APP_NAME." - Clientes");
-			$view->addCSSFile('main.css');
-			$view->addCSSFile('home.css');
-			$view->addCSSFile('resultslist.css');
-			$view->addJSFile('arquivar.js');
-			$view->setNavLinkActive('clientes');
-			require_once PROJECT_DIRECTORY.'/public/View/Clientes.php';
+			header("Location: ".DOMAIN."/clientes");
 		}
 
 		public function save(): void {
@@ -96,16 +87,11 @@
 			$cliente = new ClienteModel();
 			$editReturn = $cliente->edit();
 			$cliente->getAllByPage($pageNum);
+			$_SESSION['error'] = $editReturn['error'];
+			$_SESSION['errorMsg'] = $editReturn['errorMsg'];
 
 			// View
-			$view = new View();
-			$view->setPageTitle(APP_NAME." - Clientes");
-			$view->addCSSFile('main.css');
-			$view->addCSSFile('home.css');
-			$view->addCSSFile('resultslist.css');
-			$view->addJSFile('arquivar.js');
-			$view->setNavLinkActive('clientes');
-			require_once PROJECT_DIRECTORY.'/public/View/Clientes.php';
+			header("Location: ".DOMAIN."/clientes");
 		}
 	}
 ?>

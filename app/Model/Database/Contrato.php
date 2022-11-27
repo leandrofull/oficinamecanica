@@ -14,7 +14,7 @@
 		}
 
 		public function accept(string $contratoID): void {
-			$tmp = $this->select("id, validada, status, historico", "ordens", "WHERE validacao_link = '{$contratoID}'");
+			$tmp = $this->select("id, validada, status, historico, validacao_whatsapp", "ordens", "WHERE validacao_link = '{$contratoID}'");
 
 			$count = $tmp->rowCount();
 
@@ -30,7 +30,8 @@
 					exit;
 				} else {
 					$historico = $result['historico'];
-					$historico .= "\n-> Serviço autorizado pelo cliente em ".date('d/m/Y').", às ".date('H:i:s').", através deste link, utilizando o IP ".getClientIp::get().";";
+					$whatsapp = $result['validacao_whatsapp'];
+					$historico .= "\n-> Serviço autorizado pelo cliente em ".date('d/m/Y').", às ".date('H:i:s').", através deste link, utilizando o IP ".getClientIp::get().". Este link foi recebido via WhatsApp no número ".$whatsapp.";";
 
 					$this->update("ordens", ['status', 'validada', 'validacao_ip', 'validacao_data', 'historico', 'ultima_modificacao'], [1, 1, "'".getClientIp::get()."'", "'".date('Y-m-d H:i:s')."'", "'".$historico."'", "'".date('Y-m-d H:i:s')."'"], "WHERE id = {$result["id"]}");
 
@@ -56,7 +57,7 @@
 					exit;
 				} else {
 					$historico = $result['historico'];
-					$historico .= "\n-> Serviço não autorizado pelo cliente. O mesmo desautorizou a realização do serviço em ".date("d/m/Y").", às ".date('H:i:s').", através deste link, utilizando o IP ".getClientIp::get().";";
+					$historico .= "\n-> Serviço não autorizado pelo cliente. O mesmo desautorizou a realização do serviço em ".date("d/m/Y").", às ".date('H:i:s').", através deste link, utilizando o IP ".getClientIp::get().". Este link foi recebido via WhatsApp no número ".$whatsapp.";";
 
 					$this->update("ordens", ['status', 'validada', 'validacao_ip', 'validacao_data', 'historico', 'ultima_modificacao'], [3, 0, "'".getClientIp::get()."'", "'".date('Y-m-d H:i:s')."'", "'".$historico."'", "'".date('Y-m-d H:i:s')."'"], "WHERE id = {$result["id"]}");
 
@@ -66,18 +67,34 @@
 		}
 
 		public function showById(string $contratoID): void {
-			$tmp = $this->select("id, validada, status", "ordens", "WHERE validacao_link = '{$contratoID}'");
+			$tmp = $this->select("id, validada, status, validacao_data", "ordens", "WHERE validacao_link = '{$contratoID}'");
 
 			$count = $tmp->rowCount();
 
 			if($count < 1) {
 				\HttpError::error404();
 				exit;
+			} else {
+				$result = $tmp->fetch();
+				$ordemID = $result['id'];
+				$validacaoData = $result['validacao_data'];
+				if(isset($validacaoData)) {
+					$validacaoData = new \DateTime($validacaoData);
+					$hoje = new \DateTime(date('Y-m-d H:i:s'));
+					$interval = date_diff($validacaoData, $hoje);
+					if($interval->days > 90) {
+						$this->update("ordens", ['validacao_link'], ['null'], "WHERE id = {$ordemID}");
+						\HttpError::error404();
+						exit;
+					}
+				}
 			}
 		}
 
 		public function canvas(string $contratoID): void {
-			$result = $this->select("o.*, o.id as ordemID, c.*, c.nome as clienteNome, c.cpf as clienteCPF, c.telefone, c.whatsapp, c.celular, v.*, f.*, f.nome as respNome, f.cpf as respCPF, o.observacoes as ordemObs, o.data_cadastro as ordemCadastro", "ordens o", "INNER JOIN veiculos v ON v.id = o.veiculo_id INNER JOIN clientes c ON c.id = v.proprietario_id INNER JOIN funcionarios f ON f.id = o.responsavel_id WHERE o.validacao_link = '{$contratoID}'");
+			$this->showById($contratoID);
+
+			$result = $this->select("o.*, o.id as ordemID, c.*, c.nome as clienteNome, c.cpf as clienteCPF, c.telefone, c.whatsapp, c.celular, v.*, f.*, f.nome as respNome, f.cpf as respCPF, o.observacoes as ordemObs, o.data_cadastro as ordemCadastro, o.validacao_whatsapp", "ordens o", "INNER JOIN veiculos v ON v.id = o.veiculo_id INNER JOIN clientes c ON c.id = v.proprietario_id INNER JOIN funcionarios f ON f.id = o.responsavel_id WHERE o.validacao_link = '{$contratoID}'");
 
 			$count = $result->rowCount();
 			$result = $result->fetch();
@@ -409,7 +426,7 @@
 				$hora = $data[1];
 				$data = explode("-", $data[0]);
 				$data = $data[2]."/".$data[1]."/".$data[0];
-				$pdf->MultiCell(182.5, 5, utf8_decode("Serviço autorizado pelo cliente em ".$data.", às ".$hora.", através deste link, utilizando o IP ".$result["validacao_ip"]."."), 0, 'J', false);
+				$pdf->MultiCell(182.5, 5, utf8_decode("Serviço autorizado pelo cliente em ".$data.", às ".$hora.", através deste link, utilizando o IP ".$result["validacao_ip"].". Este link foi recebido via WhatsApp no número ".$result['validacao_whatsapp']."."), 0, 'J', false);
 				$pdf->Ln(7);
 				$pdf->SetX(14);
 				$pdf->SetFont('Helvetica', 'B', 11);
@@ -428,7 +445,7 @@
 				$hora = $data[1];
 				$data = explode("-", $data[0]);
 				$data = $data[2]."/".$data[1]."/".$data[0];
-				$pdf->MultiCell(182.5, 5, utf8_decode("Serviço autorizado pelo cliente em ".$data.", às ".$hora.", através deste link, utilizando o IP ".$result["validacao_ip"]."."), 0, 'J', false);
+				$pdf->MultiCell(182.5, 5, utf8_decode("Serviço autorizado pelo cliente em ".$data.", às ".$hora.", através deste link, utilizando o IP ".$result["validacao_ip"].". Este link foi recebido via WhatsApp no número ".$result['validacao_whatsapp']."."), 0, 'J', false);
 				$pdf->Ln(7);
 				$pdf->SetX(14);
 				$pdf->SetFont('Helvetica', 'B', 11);
@@ -451,7 +468,7 @@
 				$hora = $data[1];
 				$data = explode("-", $data[0]);
 				$data = $data[2]."/".$data[1]."/".$data[0];
-				$pdf->MultiCell(182.5, 5, utf8_decode("Serviço não autorizado pelo cliente. O mesmo desautorizou a realização do serviço em ".$data.", às ".$hora.", através deste link, utilizando o IP ".$result["validacao_ip"]."."), 0, 'J', false);
+				$pdf->MultiCell(182.5, 5, utf8_decode("Serviço não autorizado pelo cliente. O mesmo desautorizou a realização do serviço em ".$data.", às ".$hora.", através deste link, utilizando o IP ".$result["validacao_ip"].". Este link foi recebido via WhatsApp no número ".$result['validacao_whatsapp']."."), 0, 'J', false);
 			}
 
 			$pdf->Output();	

@@ -17,8 +17,8 @@
 						break;
 					}
 
-					if($_FILES['inputVeiculoFotos']['size'][$i] > 10485760) {
-						$_FILES['inputVeiculoFotos']['error'][0] = 'ERRO! As fotos devem conter 10 MB cada uma no máximo.';
+					if($_FILES['inputVeiculoFotos']['size'][$i] > 4194304) {
+						$_FILES['inputVeiculoFotos']['error'][0] = 'ERRO! As fotos devem conter 4 MB cada uma no máximo.';
 						return false;
 						break;
 					}
@@ -27,8 +27,8 @@
 				}
 			}
 
-			if($countFiles > 10) {
-				$_FILES['inputVeiculoFotos']['error'][0] = 'ERRO! Só é permitido o envio de 10 fotos por vez.';
+			if($countFiles > 6) {
+				$_FILES['inputVeiculoFotos']['error'][0] = 'ERRO! Só é permitido o envio de 6 fotos por Ordem de Serviço.';
 				return false;
 			}
 

@@ -16,6 +16,7 @@
 			$view = new View();
 			$view->setPageTitle("Clientes Arquivados");
 			$view->addCSSFile('main.css');
+			$view->addCSSFile('home.css');
 			$view->addCSSFile('resultslist.css');
 			$view->addJSFile('desarquivar.js');
 			require_once PROJECT_DIRECTORY.'/public/View/Clientes.php';
@@ -29,15 +30,11 @@
 			$cliente->archiveMode = true;
 			$archiveReturn = $cliente->archiveByIds();
 			$cliente->getAllByPage($pageNum);
+			$_SESSION['error'] = $archiveReturn['error'];
+			$_SESSION['errorMsg'] = $archiveReturn['errorMsg'];
 
 			// View
-			$view = new View();
-			$view->setPageTitle("Clientes Arquivados");
-			$view->addCSSFile('main.css');
-			$view->addCSSFile('home.css');
-			$view->addCSSFile('resultslist.css');
-			$view->addJSFile('desarquivar.js');
-			require_once PROJECT_DIRECTORY.'/public/View/Clientes.php';
+			header("Location: ".DOMAIN."/clientes/arquivados/1");
 		}
 
 	}

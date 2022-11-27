@@ -37,24 +37,27 @@
 
 			//PESQUISA
 			$pesquisa = "";
-			if(isset($_GET['search']) && !empty($_GET['search'])) {
-				$name = preg_replace("/[^a-zA-Zà-úÀ-Ú]/", " ",$_GET['search']);
-				$name = preg_replace("/\s{2,}/", " ", trim($name));
-				if(strlen($name) < 3) $name = "156115635";
+			if( isset($_GET['search']) &&
+				(!empty($_GET['search']) || $_GET['search'] == "0") )
+			{
+				$_GET['search'] = preg_replace('/[^A-Za-zÀ-Úà-ú0-9\#\(\)\-\.\_\ ]/', "", $_GET['search']);
+
+				$name = preg_replace("/\s{2,}/", " ", trim($_GET['search']));
+				if(mb_strlen($name) < 1) $name = "156115635";
 
 				$pesquisa = " AND (nome LIKE '%$name%'";
 
-				$cpf = preg_replace("/\D/", "", $_GET['search']);
-				$cpf = preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "$1.$2.$3-$4", $cpf);
-				$teste = preg_match("/^\d{3}\.\d{3}\.\d{3}\-\d{2}$/", $cpf);
-				if(!$teste) $cpf = "FAILED";
+				$cpf = str_replace(".", "", trim($_GET['search']));
+				$cpf = str_replace("-", "", $cpf);
+				if(!ctype_digit($cpf)) $cpf = "FAILED";
+				
+				$pesquisa .= " OR REPLACE(REPLACE(cpf, '-', ''), '.', '') LIKE '%$cpf%'";
 
-				$pesquisa .= " OR cpf LIKE '%$cpf%'";
-
-				$telefone = preg_replace("/\D/", "", $_GET['search']);
-				$telefone = "55".$telefone;
-				if(strlen($telefone) < 12 || strlen($telefone) > 13)
-					$telefone = "FAILED";
+				$telefone = str_replace("(", "", trim($_GET['search']));
+				$telefone = str_replace(")", "", $telefone);
+				$telefone = str_replace(" ", "", $telefone);
+				$telefone = str_replace("-", "", $telefone);
+				if(!ctype_digit($telefone)) $telefone = "FAILED";
 
 				$pesquisa .= " OR telefone LIKE '%$telefone%'";
 				$pesquisa .= " OR celular LIKE '%$telefone%'";
@@ -208,12 +211,13 @@
 						$this->update('clientes', ['arquivado', 'ultima_modificacao'], ['true', "'".date('Y-m-d H:i:s')."'"], "WHERE id=".$value);
 					}
 				}
+				if($this->archiveMode) $errorMsg = count($_POST['selectedItems'])." clientes foram desarquivados com sucesso!";
+				else $errorMsg = count($_POST['selectedItems'])." clientes foram arquivados com sucesso!";
 			}
 
 			return [
 			"error" => $error,
-			"errorMsg" => $errorMsg,
-			"affectedRecords" => count($_POST['selectedItems'])];
+			"errorMsg" => $errorMsg];
 		}
 
 		public function register(): array {
@@ -255,6 +259,8 @@
 					$values .= "'$inputSexo', '$inputNasc'";
 
 					$this->insert($table, $columns, $values);
+
+					$errorMsg = "Cliente cadastrado com sucesso!";
 				}
 			}
 
@@ -314,6 +320,8 @@
 
 						$filter = "WHERE id = ".$_POST['inputID'];
 						$this->update($table, $columns, $values, $filter);
+
+						$errorMsg = "Informações do cliente atualizadas com sucesso!";
 					}
 				}
 			}
@@ -329,8 +337,8 @@
 			$tmp--;
 			$tmp = str_pad($tmp, 2, '0', STR_PAD_LEFT);
 			$mesAnterior = date("Y-".$tmp."-d H:i:s");
-			$filter = "WHERE data_cadastro BETWEEN '{$mesAnterior}'";
-			$filter .= " AND '{$dataAtual}'";
+			$filter = "WHERE (data_cadastro BETWEEN '{$mesAnterior}'";
+			$filter .= " AND '{$dataAtual}') AND (arquivado = 0)";
 
 			$tmp = $this->select("COUNT(*) as total", "clientes", $filter);
 			

@@ -3,6 +3,7 @@
 
 	use app\Controller\InputCleaning\Ordens as InputCleaning;
 	use app\Controller\InputFilesCheck\Ordens as InputFilesCheck;
+	use app\Controller\UploadFile;
 
 	class Ordem extends Database {
 		private array $id = array('');
@@ -54,6 +55,8 @@
 			if( isset($_GET['search']) &&
 				(!empty($_GET['search']) || $_GET['search'] == "0") )
 			{
+				$_GET['search'] = preg_replace('/[^A-Za-zÀ-Úà-ú0-9\#\(\)\-\.\_\ ]/', "", $_GET['search']);
+				
 				$numeroOS = str_replace("#", "", trim($_GET['search']));
 				if(!ctype_digit($numeroOS)) $numeroOS = "-1";
 
@@ -61,49 +64,38 @@
 
 				$clienteCPF = str_replace(".", "", trim($_GET['search']));
 				$clienteCPF = str_replace("-", "", $clienteCPF);
-				if( !ctype_digit($clienteCPF) ||
-					 strlen($clienteCPF) != 11 ) $clienteCPF = "FAIL";
-				else 
-					$clienteCPF = preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/",
-										"$1.$2.$3-$4", $clienteCPF);			
+				if(!ctype_digit($clienteCPF)) $clienteCPF = "FAILED";
+				
+				$pesquisa .= " OR REPLACE(REPLACE(c.cpf, '-', ''), '.', '') LIKE '%$clienteCPF%'";
 
-				$pesquisa .= " OR c.cpf = '$clienteCPF'";
-
-				$clienteNome = preg_replace("/[^a-zA-Zà-úÀ-Ú\ ]/", "", $_GET['search']);
-				$clienteNome = preg_replace("/\s{2,}/", " ", trim($clienteNome));
-				if(mb_strlen($clienteNome) < 3) $clienteNome = "5153153";		
+				$clienteNome = preg_replace("/\s{2,}/", " ", trim($_GET['search']));
+				if(mb_strlen($clienteNome) < 1) $clienteNome = "156115635";	
 
 				$pesquisa .= " OR c.nome LIKE '%$clienteNome%'";
 
 				$veiculoPlaca = str_replace("-", "", trim($_GET['search']));
-				$teste = preg_match("/[a-zA-Z0-9]/", $veiculoPlaca);
-				if(strlen($veiculoPlaca) != 7 || !$teste)
-					$veiculoPlaca = "FAIL";
-				else
-					$veiculoPlaca = substr($veiculoPlaca, 0, 3)."-".
-									substr($veiculoPlaca, 3);					
+				if(mb_strlen($veiculoPlaca) < 1) $veiculoPlaca = "FAILED";
+				
+				$pesquisa .= " OR REPLACE(v.placa, '-', '') LIKE '%$veiculoPlaca%'";
 
-				$pesquisa .= " OR v.placa = '$veiculoPlaca'";
+				$servicoTipo = trim($_GET['search']);
 
-				$servicoTipo = strtolower(trim($_GET['search']));
-				if( $servicoTipo != 'conserto' &&
-					$servicoTipo != 'revisão' && 
-					$servicoTipo != 'revisao' )	$servicoTipo = "FAIL";
+				$pesquisa .= " OR o.servico_tipo LIKE '%$servicoTipo%'";
 
-				$pesquisa .= " OR o.servico_tipo = '$servicoTipo'";
-
-				$status = array();
-				$status["Orçamento"] = 0;
-				$status["Orcamento"] = 0;
-				$status["Em andamento"] = 1;
-				$status["Validar"] = 2;
-				$status["Finalizada"] = 3;
-				$status["Cancelada"] = 3;
-				$search = ucfirst(mb_strtolower(trim($_GET['search'])));
-				if(!isset($status[$search])) $search = 4;
-				else $search = $status[$search];
-
-				$pesquisa .= " OR o.status = $search)";
+				if(strpos("orçamento", mb_strtolower(trim($_GET['search']))) !== false) $status = 0;
+				else if(strpos("orcamento", mb_strtolower(trim($_GET['search']))) !== false) $status = 0;
+				else if(strpos("em andamento", mb_strtolower(trim($_GET['search']))) !== false) $status = 1;
+				else if(strpos("finalizada", mb_strtolower(trim($_GET['search']))) !== false) $status = 3;
+				else if(strpos("cancelada", mb_strtolower(trim($_GET['search']))) !== false) $status = 4;
+				else $status = 5;
+				if($status == 3) {
+					$pesquisa .= " OR (o.status = $status AND o.validada = 1))";
+				} else if($status == 4) {
+					$status = 3;
+					$pesquisa .= " OR (o.status = $status AND o.validada = 0))";
+				} else {
+					$pesquisa .= " OR o.status = $status)";
+				}
 			}
 			//PESQUISA
 
@@ -398,7 +390,7 @@
 				$extension = explode(".", $_FILES['inputVeiculoFotos']['name'][$i]);
 				$extension = array_pop($extension);
 				$filename = $filename.".".$extension;
-				if(move_uploaded_file($_FILES['inputVeiculoFotos']['tmp_name'][$i], PROJECT_DIRECTORY."/app/Images/Ordens/Veiculos/".$filename))
+				if(UploadFile::start($_FILES['inputVeiculoFotos']['tmp_name'][$i], PROJECT_DIRECTORY."/app/Images/Ordens/Veiculos/".$filename))
 				{
 					array_push($veiculoFotos['filename'], $filename);
 					array_push($veiculoFotos['extension'], $extension);
@@ -577,7 +569,7 @@
 					$extension = explode(".", $_FILES['inputVeiculoFotos']['name'][$i]);
 					$extension = array_pop($extension);
 					$filename = $filename.".".$extension;
-					if(move_uploaded_file($_FILES['inputVeiculoFotos']['tmp_name'][$i], PROJECT_DIRECTORY."/app/Images/Ordens/Veiculos/".$filename))
+					if(UploadFile::start($_FILES['inputVeiculoFotos']['tmp_name'][$i], PROJECT_DIRECTORY."/app/Images/Ordens/Veiculos/".$filename))
 					{
 						array_push($veiculoFotos['filename'], $filename);
 						array_push($veiculoFotos['extension'], $extension);
@@ -741,6 +733,9 @@
 					"WHERE id = {$_POST['inputID']}");
 			}
 
+			$this->update("ordens", ['validacao_whatsapp'], ["'{$_POST['WhatsApp']}'"],
+					"WHERE id = {$_POST['inputID']}");
+
 			$tmp = $this->select("id, validacao_link", "ordens", "WHERE id = {$_POST['inputID']}");
 
 			$validacaoLink = $tmp->fetch()['validacao_link'];
@@ -791,8 +786,8 @@
 			$tmp--;
 			$tmp = str_pad($tmp, 2, '0', STR_PAD_LEFT);
 			$mesAnterior = date("Y-".$tmp."-d H:i:s");
-			$filter = "WHERE data_cadastro BETWEEN '{$mesAnterior}'";
-			$filter .= " AND '{$dataAtual}'";
+			$filter = "WHERE (data_cadastro BETWEEN '{$mesAnterior}'";
+			$filter .= " AND '{$dataAtual}') AND (arquivado = 0)";
 
 			$tmp = $this->select("COUNT(*) as total", "ordens", $filter);
 			
@@ -812,7 +807,7 @@
 			$mesAnterior = date("Y-".$tmp."-d H:i:s");
 			$filter = "WHERE (ultima_modificacao BETWEEN '{$mesAnterior}'";
 			$filter .= " AND '{$dataAtual}')";
-			$filter .= " AND (status = {$status})";
+			$filter .= " AND (status = {$status}) AND (arquivado = 0)";
 			if($status == 3 || $status == 4) $filter .= $validacao;
 
 			$tmp = $this->select("COUNT(*) as total", "ordens", $filter);

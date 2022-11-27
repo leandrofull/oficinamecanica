@@ -29,38 +29,34 @@
 
 			//PESQUISA
 			$pesquisa = "";
-			if(isset($_GET['search']) && !empty($_GET['search'])) {
-				$placa = preg_replace('/[^a-zA-Z0-9]/', '', strtoupper($_GET['search']));
-				$placa = substr($placa, 0, 3)."-".substr($placa, 3);
-				$teste = preg_match("/[A-Z]{3}\-[0-9][0-9A-Z][0-9]{2}/",$placa);
-				if(!$teste) $placa = "FAIL";
+			if( isset($_GET['search']) &&
+				(!empty($_GET['search']) || $_GET['search'] == "0") )
+			{
+				$_GET['search'] = preg_replace('/[^A-Za-zÀ-Úà-ú0-9\#\(\)\-\.\_\ ]/', "", $_GET['search']);
+				
+				$placa = str_replace("-", "", trim($_GET['search']));
+				if(mb_strlen($placa) < 1) $placa = "FAILED";
+				
+				$pesquisa .= " AND (REPLACE(a.placa, '-', '') LIKE '%$placa%'";
 
-				$pesquisa = " AND (a.placa LIKE '%$placa%'";
-
-				$marca = preg_replace('/[^a-zA-Zà-úÀ-Ú\ ]/', '', mb_strtoupper($_GET['search']));
-				$marca = preg_replace('/\s{2,}/', ' ', trim($marca));
-				if(mb_strlen($marca) < 3 || mb_strlen($marca) > 30)
-					$marca = "@@@@@";
+				$marca = preg_replace("/\s{2,}/", " ", trim($_GET['search']));
+				if(mb_strlen($marca) < 1) $marca = "@@@@@";
 
 				$pesquisa .= " OR concat(a.marca, ' ', a.modelo) LIKE '%$marca%'";
 
-				$modelo = preg_replace('/[^a-zA-Zà-úÀ-Ú0-9\.\-\ ]/', '', mb_strtoupper($_GET['search']));
-				$modelo = preg_replace('/\s{2,}/', ' ', trim($modelo));
-				if(mb_strlen($modelo) < 5 || mb_strlen($modelo) > 50)
-					$modelo = "@@@@@";
+				$modelo = preg_replace("/\s{2,}/", " ", trim($_GET['search']));
+				if(mb_strlen($modelo) < 1) $modelo = "@@@@@";
 
 				$pesquisa .= " OR concat(a.marca, ' ', a.modelo) LIKE '%$modelo%'";
 
-				$propCPF = preg_replace('/[^0-9]/', '', $_GET['search']);
-				$propCPF = preg_replace('/(\d{3})(\d{3})(\d{3})(\d{2})/', "$1.$2.$3-$4", $propCPF);
-				$teste = preg_match('/^\d{3}\.\d{3}\.\d{3}\-\d{2}$/', $propCPF);
-				if(!$teste) $propCPF = "FAIL";
+				$propCPF = str_replace(".", "", trim($_GET['search']));
+				$propCPF = str_replace("-", "", $propCPF);
+				if(!ctype_digit($propCPF)) $propCPF = "FAILED";
+				
+				$pesquisa .= " OR REPLACE(REPLACE(b.cpf, '-', ''), '.', '') LIKE '%$propCPF%'";
 
-				$pesquisa .= " OR b.cpf LIKE '%$propCPF%'";
-
-				$propName = preg_replace("/[^a-zA-Zà-úÀ-Ú]/", " ", $_GET['search']);
-				$propName = preg_replace("/\s{2,}/", " ", trim($propName));
-				if(strlen($propName) < 3) $propName = "545615151351356";
+				$propName = preg_replace("/\s{2,}/", " ", trim($_GET['search']));
+				if(mb_strlen($propName) < 1) $propName = "156115635";
 
 				$pesquisa .= " OR b.nome LIKE '%$propName%')";
 			}
@@ -178,12 +174,13 @@
 						$this->update('veiculos', ['arquivado', 'ultima_modificacao'], ['true', "'".date('Y-m-d H:i:s')."'"], "WHERE id=".$value);
 					}
 				}
+				if($this->archiveMode) $errorMsg = count($_POST['selectedItems'])." veículos foram desarquivados com sucesso!";
+				else $errorMsg = count($_POST['selectedItems'])." veículos foram arquivados com sucesso!";
 			}
 
 			return [
 			"error" => $error,
-			"errorMsg" => $errorMsg,
-			"affectedRecords" => count($_POST['selectedItems'])];
+			"errorMsg" => $errorMsg];
 		}
 
 		public function validatePropCPF(): string {
@@ -245,6 +242,8 @@
 						$values .= "'$inputObs', '$idProp'";
 
 						$this->insert($table, $columns, $values);
+
+						$errorMsg = "Veículo cadastrado com sucesso!";
 					}
 				}
 			}
@@ -305,6 +304,8 @@
 
 							$filter = "WHERE id = ".$_POST['inputID'];
 							$this->update($table, $columns, $values, $filter);
+
+							$errorMsg = "Informações do veículo atualizadas com sucesso!";
 						}
 					}
 				}
@@ -321,8 +322,8 @@
 			$tmp--;
 			$tmp = str_pad($tmp, 2, '0', STR_PAD_LEFT);
 			$mesAnterior = date("Y-".$tmp."-d H:i:s");
-			$filter = "WHERE data_cadastro BETWEEN '{$mesAnterior}'";
-			$filter .= " AND '{$dataAtual}'";
+			$filter = "WHERE (data_cadastro BETWEEN '{$mesAnterior}'";
+			$filter .= " AND '{$dataAtual}') AND (arquivado = 0)";
 
 			$tmp = $this->select("COUNT(*) as total", "veiculos", $filter);
 			

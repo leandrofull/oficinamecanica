@@ -5,14 +5,18 @@
 
 	<!-- Return -->
 	<?php 
-		if(isset($_GET['registerError']) && $_GET['registerError'] == true) {
+		if(isset($_SESSION['error']) && $_SESSION['error'] == true) {
 			echo '<div class="container-fluid welcome" style="background-color:#fc5b5b;font-weight:normal;">';	
-			echo $_GET['registerErrorMsg'].'  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">sentiment_dissatisfied</span>';
+			echo $_SESSION['errorMsg'].'  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">sentiment_dissatisfied</span>';
 			echo '</div>';
-		} else if(isset($_GET['registerError']) && $_GET['registerError'] == false) {
+			unset($_SESSION['error']);
+			unset($_SESSION['errorMsg']);
+		} else if(isset($_SESSION['error']) && $_SESSION['error'] == false) {
 			echo '<div class="container-fluid welcome" style="font-weight:normal;">';
-			echo $_GET['registerErrorMsg'].'  <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">mood</span>';
+			echo $_SESSION['errorMsg'].' <span class="material-symbols-outlined" style="font-size:2rem;margin-left:5px;">mood</span>';
 			echo '</div>';
+			unset($_SESSION['error']);
+			unset($_SESSION['errorMsg']);
 		}
 	?>
 	<!-- Return -->
@@ -35,6 +39,7 @@
 	<!-- List -->
 	<div class="list">
 		<!-- Table -->
+		<div class="divTable">
 		<table class="table">
 		  <thead>
 		    <tr class="list-cols">
@@ -79,6 +84,7 @@
 			<?php } ?>
 		  </tbody>
 		</table>
+		</div>
 		<!-- Table -->
 
 		<!-- Pagination -->

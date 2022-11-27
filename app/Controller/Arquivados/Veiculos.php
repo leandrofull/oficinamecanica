@@ -16,6 +16,7 @@
 			$view = new View();
 			$view->setPageTitle("Veículos Arquivados");
 			$view->addCSSFile('main.css');
+			$view->addCSSFile('home.css');
 			$view->addCSSFile('resultslist.css');
 			$view->addJSFile('desarquivar.js');
 			require_once PROJECT_DIRECTORY.'/public/View/Veiculos.php';
@@ -29,15 +30,11 @@
 			$veiculo->archiveMode = true;
 			$archiveReturn = $veiculo->archiveByIds();
 			$veiculo->getAllByPage($pageNum);
+			$_SESSION['error'] = $archiveReturn['error'];
+			$_SESSION['errorMsg'] = $archiveReturn['errorMsg'];
 
 			// View
-			$view = new View();
-			$view->setPageTitle("Veículos Arquivados");
-			$view->addCSSFile('main.css');
-			$view->addCSSFile('home.css');
-			$view->addCSSFile('resultslist.css');
-			$view->addJSFile('desarquivar.js');
-			require_once PROJECT_DIRECTORY.'/public/View/Veiculos.php';
+			header("Location: ".DOMAIN."/veiculos/arquivados/1");
 		}
 	}
 ?>
