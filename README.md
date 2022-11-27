@@ -1,5 +1,5 @@
 # oficinamecanica
-Projeto para a Faculdade
+<strong>Projeto para a Faculdade</strong>
 
 Um projeto simples feito em PHP puro, HTML, CSS e Javascript.
 
